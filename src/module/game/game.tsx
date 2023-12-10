@@ -1,10 +1,45 @@
 import { GameBox } from '@/components/game/box';
 import { Cards } from '@/components/game/cards';
-import Counter from '@/components/game/counter/counter';
+import { Counter } from '@/components/game/counter';
 import { useEffect, useRef, useState } from 'react';
 import FamilyFeudLogo from '@/assets/images/family-feud.png';
 
 const gameKey = 'family-feud';
+
+const item = {
+  question:
+    'Name something the police do at the station to those who are arrested',
+  answers: [
+    {
+      answer: 'Fingerprint Them',
+      value: 56,
+    },
+    {
+      answer: 'Book Them',
+      value: 20,
+    },
+    {
+      answer: 'Question',
+      value: 5,
+    },
+    {
+      answer: 'Mug Shot',
+      value: 5,
+    },
+    {
+      answer: 'Give One Phone Call',
+      value: 3,
+    },
+    {
+      answer: 'Put Then in Cell',
+      value: 3,
+    },
+    {
+      answer: 'Read Their Rights',
+      value: 2,
+    },
+  ],
+};
 
 export const Game = () => {
   const broadcastChannelRef = useRef<BroadcastChannel | null>(null);
@@ -62,8 +97,7 @@ export const Game = () => {
           id="question"
         >
           <span className="inline-block align-middle leading-normal [text-shadow:initial]">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat a
-            perferendis optio?
+            {item.question}
           </span>
         </div>
         <div
@@ -71,20 +105,54 @@ export const Game = () => {
           id="answers"
         >
           <div className="flex-1 flex flex-col">
-            <Cards />
-            <Cards />
-            <Cards />
-            <Cards />
+            {item.answers.slice(0, 4).map((answer, index) => (
+              <Cards
+                key={index}
+                answer={answer.answer}
+                value={answer.value}
+                order={index + 1}
+                setScore={setGameScore}
+              />
+            ))}
+            {item.answers.slice(0, 4).length < 4 &&
+              Array.from({ length: 4 - item.answers.slice(0, 4).length }).map(
+                (_, index) => (
+                  <Cards
+                    key={index}
+                    answer=""
+                    value={0}
+                    order={0}
+                    setScore={setGameScore}
+                  />
+                ),
+              )}
           </div>
           <div className="flex-1 flex flex-col">
-            <Cards />
-            <Cards />
-            <Cards />
-            <Cards />
+            {item.answers.slice(4, 7).map((answer, index) => (
+              <Cards
+                key={index}
+                answer={answer.answer}
+                value={answer.value}
+                order={index + 5}
+                setScore={setGameScore}
+              />
+            ))}
+            {item.answers.slice(4, 7).length < 4 &&
+              Array.from({ length: 4 - item.answers.slice(4, 7).length }).map(
+                (_, index) => (
+                  <Cards
+                    key={index}
+                    answer=""
+                    value={0}
+                    order={0}
+                    setScore={setGameScore}
+                  />
+                ),
+              )}
           </div>
         </div>
         <div
-          className="flex gap-x-4 justify-center items-center absolute bottom-16 inset-x-0 m-auto w-[500px]"
+          className="flex gap-x-4 justify-center items-center absolute bottom-16 inset-x-0 m-auto"
           id="control"
         >
           <button
@@ -93,14 +161,35 @@ export const Game = () => {
               background:
                 'linear-gradient(to bottom, #7db9e8 0%, #207cca 49%, #2989d8 50%, #1e5799 100%)',
             }}
+            onClick={() => {
+              setTeamAScore(prevScore => prevScore + gameScore);
+              setGameScore(0);
+            }}
           >
             Award Team A
+          </button>
+          <button
+            className="border-[3px] border-white text-2xl p-2 px-6"
+            style={{
+              background:
+                'linear-gradient(to bottom, #7db9e8 0%, #207cca 49%, #2989d8 50%, #1e5799 100%)',
+            }}
+            onClick={() => {
+              setGameScore(0);
+              window.dispatchEvent(new Event('FF_RESET_ROUND'));
+            }}
+          >
+            New Question
           </button>
           <button
             className="rounded-[0_50px_50px_0] border-[3px] border-white text-2xl p-2 px-6"
             style={{
               background:
                 'linear-gradient(to bottom, #7db9e8 0%, #207cca 49%, #2989d8 50%, #1e5799 100%)',
+            }}
+            onClick={() => {
+              setTeamBScore(prevScore => prevScore + gameScore);
+              setGameScore(0);
             }}
           >
             Award Team B

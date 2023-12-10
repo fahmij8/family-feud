@@ -1,14 +1,47 @@
-import { useState } from 'react';
+import { useState, type Dispatch, type SetStateAction, useEffect } from 'react';
+import { twMerge } from 'tailwind-merge';
 
-export const Cards = () => {
+interface CardsProps {
+  answer: string;
+  value: number;
+  order: number;
+  setScore: Dispatch<SetStateAction<number>>;
+}
+
+export const Cards = ({ answer, value, order, setScore }: CardsProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
+
+  useEffect(() => {
+    const callback = () => {
+      setIsFlipped(false);
+    };
+
+    window.addEventListener('FF_RESET_ROUND', callback);
+
+    return () => {
+      window.removeEventListener('FF_RESET_ROUND', callback);
+    };
+  }, []);
 
   return (
     <div
-      className="[&:not(.empty)]:cursor-pointer inline-block relative align-top h-[60px] m-1 bg-black border-[2px] border-white [perspective:800px]"
+      className={twMerge(
+        '[&:not(.empty)]:cursor-pointer inline-block relative align-top h-[60px] m-1 bg-black border-[2px] border-white [perspective:800px]',
+        answer === '' && 'empty',
+      )}
       id="card-holder"
       onClick={() => {
-        setIsFlipped(prev => !prev);
+        if (answer === '') return;
+        setIsFlipped(prev => {
+          const next = !prev;
+          if (next) {
+            setScore(prevScore => prevScore + value);
+          } else {
+            setScore(prevScore => prevScore - value);
+          }
+
+          return next;
+        });
       }}
     >
       <div
@@ -29,15 +62,17 @@ export const Cards = () => {
             backfaceVisibility: 'hidden',
           }}
         >
-          <span
-            className="text-2xl inset-0 absolute h-fit py-0.5 rounded-[50%] w-[45px] block m-auto border-[2px] border-[#003c7b] font-semibold"
-            style={{
-              background:
-                'linear-gradient(to bottom, #7db9e8 0%, #207cca 49%, #2989d8 50%, #1e5799 100%)',
-            }}
-          >
-            1
-          </span>
+          {answer !== '' && (
+            <span
+              className="text-2xl inset-0 absolute h-fit py-0.5 rounded-[50%] w-[45px] block m-auto border-[2px] border-[#003c7b] font-semibold"
+              style={{
+                background:
+                  'linear-gradient(to bottom, #7db9e8 0%, #207cca 49%, #2989d8 50%, #1e5799 100%)',
+              }}
+            >
+              {order}
+            </span>
+          )}
         </div>
         <div
           id="card-back"
@@ -51,7 +86,7 @@ export const Cards = () => {
           }}
         >
           <span className="text-2xl inline-block align-middle ml-2 font-medium">
-            Answers
+            {answer}
           </span>
           <b
             className="absolute right-0 w-[45px] text-center border-l-[2px] border-[#003c7b] inset-y-0"
@@ -60,7 +95,7 @@ export const Cards = () => {
                 'linear-gradient(to bottom, #cedbe9 0%, #aac5de 17%, #6199c7 50%, #3a84c3 51%, #419ad6 59%, #4bb8f0 71%, #3a8bc2 84%, #26558b 100%)',
             }}
           >
-            <span className="text-xl align-middle">10</span>
+            <span className="text-xl align-middle">{value}</span>
           </b>
         </div>
       </div>
