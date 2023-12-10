@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { useMotionValue, useSpring } from 'framer-motion';
 
-export default function Counter({
+export const Counter = ({
   value,
   direction = 'up',
 }: {
   value: number;
   direction?: 'up' | 'down';
-}) {
+}) => {
   const ref = useRef<HTMLSpanElement>(null);
   const motionValue = useMotionValue(direction === 'down' ? value : 0);
   const springValue = useSpring(motionValue, {
@@ -17,7 +17,7 @@ export default function Counter({
 
   useEffect(() => {
     motionValue.set(direction === 'down' ? 0 : value);
-  }, [direction, motionValue, value]);
+  }, [motionValue, value, direction]);
 
   useEffect(
     () =>
@@ -32,4 +32,4 @@ export default function Counter({
   );
 
   return <span ref={ref}>0</span>;
-}
+};
