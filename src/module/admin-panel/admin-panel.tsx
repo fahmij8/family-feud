@@ -1,10 +1,21 @@
 import { Button } from '@nextui-org/button';
 import { Decoration } from '@/components/ui/decoration';
 import FamilyFeudLogo from '@/assets/images/family-feud.png';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+const gameKey = 'family-feud';
 
 export const AdminPanel = () => {
   const [hasGameStarted, setHasGameStarted] = useState(false);
+  const broadcastChannelRef = useRef<BroadcastChannel | null>(null);
+
+  useEffect(() => {
+    broadcastChannelRef.current = new BroadcastChannel(gameKey);
+
+    return () => {
+      broadcastChannelRef.current?.close();
+    };
+  }, []);
 
   return (
     <div className="py-10 flex flex-col justify-center items-center relative gap-y-5">
@@ -20,7 +31,9 @@ export const AdminPanel = () => {
           color="primary"
           className="mt-2 disabled:opacity-60 hover:disabled:opacity-60"
           onClick={() => {
+            sessionStorage.setItem('gameKey', gameKey);
             setHasGameStarted(true);
+            window.open('/game', '_blank');
           }}
           disabled={hasGameStarted}
         >
@@ -31,7 +44,9 @@ export const AdminPanel = () => {
           className="mt-2 disabled:opacity-60 hover:disabled:opacity-60"
           disabled={!hasGameStarted}
           onClick={() => {
-            window.open('/game', 'game', 'resizable=yes');
+            broadcastChannelRef.current?.postMessage?.({
+              type: 'start-game',
+            });
           }}
         >
           Start Game
