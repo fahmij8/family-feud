@@ -1,14 +1,20 @@
-import { useState, type Dispatch, type SetStateAction, useEffect } from 'react';
+import {
+  useState,
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  memo,
+} from 'react';
 import { twMerge } from 'tailwind-merge';
 
 interface CardsProps {
   answer: string;
   value: number;
   order: number;
-  setScore: Dispatch<SetStateAction<number>>;
+  setScore?: Dispatch<SetStateAction<number>>;
 }
 
-export const Cards = ({ answer, value, order, setScore }: CardsProps) => {
+export const Cards = memo(({ answer, value, order, setScore }: CardsProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
   useEffect(() => {
@@ -32,16 +38,18 @@ export const Cards = ({ answer, value, order, setScore }: CardsProps) => {
       id="card-holder"
       onClick={() => {
         if (answer === '') return;
+        let next: boolean;
         setIsFlipped(prev => {
-          const next = !prev;
-          if (next) {
-            setScore(prevScore => prevScore + value);
-          } else {
-            setScore(prevScore => prevScore - value);
-          }
-
+          next = !prev;
           return next;
         });
+        setTimeout(() => {
+          if (next) {
+            setScore?.(prev => prev + value);
+          } else {
+            setScore?.(prev => prev - value);
+          }
+        }, 10);
       }}
     >
       <div
@@ -101,4 +109,4 @@ export const Cards = ({ answer, value, order, setScore }: CardsProps) => {
       </div>
     </div>
   );
-};
+});

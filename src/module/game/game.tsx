@@ -81,13 +81,13 @@ export const Game = () => {
           <Counter value={gameScore} />
         </GameBox>
         <GameBox
-          className="w-[75px] h-fit text-3xl absolute inset-y-0 left-10 m-auto"
+          className="w-[90px] h-fit text-3xl absolute inset-y-0 left-10 m-auto"
           id="team-a-score"
         >
           <Counter value={teamAScore} />
         </GameBox>
         <GameBox
-          className="w-[75px] h-fit text-3xl absolute inset-y-0 right-10 m-auto"
+          className="w-[90px] h-fit text-3xl absolute inset-y-0 right-10 m-auto"
           id="team-b-score"
         >
           <Counter value={teamBScore} />
@@ -107,7 +107,7 @@ export const Game = () => {
           <div className="flex-1 flex flex-col">
             {item.answers.slice(0, 4).map((answer, index) => (
               <Cards
-                key={index}
+                key={`answer-${index}`}
                 answer={answer.answer}
                 value={answer.value}
                 order={index + 1}
@@ -117,20 +117,14 @@ export const Game = () => {
             {item.answers.slice(0, 4).length < 4 &&
               Array.from({ length: 4 - item.answers.slice(0, 4).length }).map(
                 (_, index) => (
-                  <Cards
-                    key={index}
-                    answer=""
-                    value={0}
-                    order={0}
-                    setScore={setGameScore}
-                  />
+                  <Cards key={`empty-${index}`} answer="" value={0} order={0} />
                 ),
               )}
           </div>
           <div className="flex-1 flex flex-col">
             {item.answers.slice(4, 7).map((answer, index) => (
               <Cards
-                key={index}
+                key={`answer-${index}`}
                 answer={answer.answer}
                 value={answer.value}
                 order={index + 5}
@@ -141,7 +135,7 @@ export const Game = () => {
               Array.from({ length: 4 - item.answers.slice(4, 7).length }).map(
                 (_, index) => (
                   <Cards
-                    key={index}
+                    key={`empty-${index}`}
                     answer=""
                     value={0}
                     order={0}
@@ -163,23 +157,11 @@ export const Game = () => {
             }}
             onClick={() => {
               setTeamAScore(prevScore => prevScore + gameScore);
+              window.dispatchEvent(new Event('FF_RESET_ROUND'));
               setGameScore(0);
             }}
           >
             Award Team A
-          </button>
-          <button
-            className="border-[3px] border-white text-2xl p-2 px-6"
-            style={{
-              background:
-                'linear-gradient(to bottom, #7db9e8 0%, #207cca 49%, #2989d8 50%, #1e5799 100%)',
-            }}
-            onClick={() => {
-              setGameScore(0);
-              window.dispatchEvent(new Event('FF_RESET_ROUND'));
-            }}
-          >
-            New Question
           </button>
           <button
             className="rounded-[0_50px_50px_0] border-[3px] border-white text-2xl p-2 px-6"
@@ -189,6 +171,7 @@ export const Game = () => {
             }}
             onClick={() => {
               setTeamBScore(prevScore => prevScore + gameScore);
+              window.dispatchEvent(new Event('FF_RESET_ROUND'));
               setGameScore(0);
             }}
           >
