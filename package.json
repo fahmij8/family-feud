@@ -1,5 +1,5 @@
 {
-  "name": "pdso-family-feud",
+  "name": "fahmij8-family-feud",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@nextui-org/button": "^2.0.26",
     "@nextui-org/system": "^2.0.15",
+    "@nextui-org/table": "^2.0.28",
     "@nextui-org/theme": "^2.1.17",
     "framer-motion": "^10.16.16",
     "localforage": "^1.10.0",
