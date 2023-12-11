@@ -4,6 +4,7 @@ import {
   type SetStateAction,
   useEffect,
   memo,
+  useCallback,
 } from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -14,20 +15,64 @@ interface CardsProps {
   setScore?: Dispatch<SetStateAction<number>>;
 }
 
+const audioCorrect = new Audio('./sfx/ff-correct.wav');
+const audioCorrectTop = new Audio('./sfx/ff-correct-top.mp3');
+
 export const Cards = memo(({ answer, value, order, setScore }: CardsProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const onClick = useCallback(
+    (forceValue?: boolean, cancelScore?: true) => {
+      if (answer === '') return;
+      let next: boolean;
+      setIsFlipped(prev => {
+        if (forceValue !== undefined) {
+          next = forceValue;
+          return next;
+        } else {
+          next = !prev;
+          return next;
+        }
+      });
+      if (!cancelScore) {
+        setTimeout(() => {
+          if (next) {
+            if (order === 1) {
+              audioCorrectTop.play();
+            } else {
+              audioCorrect.volume = 0.3;
+              audioCorrect.play();
+            }
+            setScore?.(prev => prev + value);
+          } else {
+            setScore?.(prev => prev - value);
+          }
+        }, 100);
+      }
+    },
+    [answer, order, setScore, value],
+  );
+
   useEffect(() => {
-    const callback = () => {
-      setIsFlipped(false);
-    };
+    if (answer) {
+      const callbackReset = () => {
+        onClick(false, true);
+      };
 
-    window.addEventListener('FF_RESET_ROUND', callback);
-
-    return () => {
-      window.removeEventListener('FF_RESET_ROUND', callback);
-    };
-  }, []);
+      const callbackOpen = () => {
+        onClick(true);
+      };
+      window.addEventListener('FF_CLOSE_ANSWER_RESET_ROUND', callbackReset);
+      window.addEventListener(`FF_OPEN_ANSWER-${order}`, callbackOpen);
+      return () => {
+        window.removeEventListener(
+          'FF_CLOSE_ANSWER_RESET_ROUND',
+          callbackReset,
+        );
+        window.removeEventListener(`FF_OPEN_ANSWER-${order}`, callbackOpen);
+      };
+    }
+  }, [answer, onClick, order]);
 
   return (
     <div
@@ -37,19 +82,7 @@ export const Cards = memo(({ answer, value, order, setScore }: CardsProps) => {
       )}
       id="card-holder"
       onClick={() => {
-        if (answer === '') return;
-        let next: boolean;
-        setIsFlipped(prev => {
-          next = !prev;
-          return next;
-        });
-        setTimeout(() => {
-          if (next) {
-            setScore?.(prev => prev + value);
-          } else {
-            setScore?.(prev => prev - value);
-          }
-        }, 10);
+        onClick();
       }}
     >
       <div
