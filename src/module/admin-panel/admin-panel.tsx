@@ -160,6 +160,7 @@ export const AdminPanel = () => {
           </div>
           <Table aria-label="Family Feud Question & Answer">
             <TableHeader>
+              <TableColumn key="number">#</TableColumn>
               <TableColumn key="answer">ANSWER</TableColumn>
               <TableColumn key="points">POINTS</TableColumn>
               <TableColumn key="actions">ACTIONS</TableColumn>
@@ -170,6 +171,9 @@ export const AdminPanel = () => {
               <TableBody>
                 {question.answers.map((answer, index) => (
                   <TableRow key={`answer-${index}`}>
+                    <TableCell key={`answer-${index}-number`}>
+                      {index + 1}
+                    </TableCell>
                     <TableCell key={`answer-${index}-answer`}>
                       {answer.answer}
                     </TableCell>
