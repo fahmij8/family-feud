@@ -6,6 +6,7 @@ import FamilyFeudLogo from '@/assets/images/family-feud.png';
 import { FFPayloadType, type FFPayload, type FFQuestions } from '@/types';
 import { RedHeart } from '@/components/game/icons/red-heart';
 import { BlackHeart } from '@/components/game/icons/black-heart';
+import { twMerge } from 'tailwind-merge';
 
 const gameKey = 'family-feud';
 const audioThemeSong = new Audio('./sfx/ff-theme-song.mp3');
@@ -151,7 +152,12 @@ export const Game = () => {
         )}
       </div>
       <div
-        className="[text-shadow:1px_1px_3px_rgba(0,0,0,1)] border-[5px] border-[#003c7b] py-[120px] px-[140px] rounded-[50%] text-center max-w-[1300px] max-h-[800px] min-w-[305px] m-auto text-white bg-[url(assets/gameboard-bg.svg)] bg-[#0C4779] relative bg-repeat bg-center [box-shadow:0_1px_24px_1px_rgba(0,0,0,0.48)]"
+        className={twMerge(
+          '[text-shadow:1px_1px_3px_rgba(0,0,0,1)] border-[5px] border-[#003c7b] py-[120px] px-[140px] rounded-[50%] text-center max-w-[1300px] max-h-[800px] min-w-[305px] m-auto text-white bg-[#0C4779] relative bg-repeat bg-center [box-shadow:0_1px_24px_1px_rgba(0,0,0,0.48)]',
+          import.meta.env.MODE === 'production'
+            ? 'bg-[url(gameboard-bg.svg)]'
+            : 'bg-[url(assets/gameboard-bg.svg)]',
+        )}
         id="gameboard"
       >
         <GameBox
