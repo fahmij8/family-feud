@@ -281,7 +281,7 @@ export const Game = () => {
           <div className="flex-1 flex flex-col">
             {item ? (
               <>
-                {item.answers.slice(4, 7).map((answer, index) => (
+                {item.answers.slice(4, 8).map((answer, index) => (
                   <Cards
                     key={`answer-${index}`}
                     answer={answer.answer}
@@ -290,7 +290,7 @@ export const Game = () => {
                     setScore={setGameScore}
                   />
                 ))}
-                {item.answers.slice(4, 7).length < 4 &&
+                {item.answers.slice(4, 8).length < 4 &&
                   Array.from({
                     length: 4 - item.answers.slice(4, 7).length,
                   }).map((_, index) => (
@@ -324,7 +324,6 @@ export const Game = () => {
             }}
             onClick={() => {
               setTeamAScore(prevScore => prevScore + gameScore);
-              window.dispatchEvent(new Event('FF_CLOSE_ANSWER_RESET_ROUND'));
               setGameScore(0);
               audioWinRound.play();
             }}
@@ -339,7 +338,6 @@ export const Game = () => {
             }}
             onClick={() => {
               setTeamBScore(prevScore => prevScore + gameScore);
-              window.dispatchEvent(new Event('FF_CLOSE_ANSWER_RESET_ROUND'));
               setGameScore(0);
               audioWinRound.play();
             }}

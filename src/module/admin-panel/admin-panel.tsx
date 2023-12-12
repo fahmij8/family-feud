@@ -26,42 +26,59 @@ import {
   TableRow,
   TableCell,
 } from '@nextui-org/table';
+import { FFQuestionLists } from '@/assets/question';
 
 const gameKey = 'family-feud';
 
-const item = {
+const SAMPLE_QUESTION = {
   question:
-    'Name something the police do at the station to those who are arrested',
+    '(Sample) Name a type of fruit that people might add to their breakfast',
   answers: [
     {
-      answer: 'Fingerprint Them',
-      value: 56,
+      answer: 'Banana',
+      value: 30,
     },
     {
-      answer: 'Book Them',
-      value: 20,
+      answer: 'Apple',
+      value: 25,
     },
     {
-      answer: 'Question',
+      answer: 'Orange',
+      value: 15,
+    },
+    {
+      answer: 'Berries',
+      value: 10,
+    },
+    {
+      answer: 'Grapes',
+      value: 8,
+    },
+    {
+      answer: 'Kiwi',
       value: 5,
     },
     {
-      answer: 'Mug Shot',
-      value: 5,
+      answer: 'Peach',
+      value: 4,
     },
     {
-      answer: 'Give One Phone Call',
+      answer: 'Pineapple',
       value: 3,
-    },
-    {
-      answer: 'Put Then in Cell',
-      value: 3,
-    },
-    {
-      answer: 'Read Their Rights',
-      value: 2,
     },
   ],
+};
+
+const appearedQuestion = new Set<string>();
+
+const shuffleQuestion = (): FFQuestions[number] => {
+  const question =
+    FFQuestionLists[Math.floor(Math.random() * FFQuestionLists.length)];
+  if (appearedQuestion.has(question.question)) {
+    return shuffleQuestion();
+  }
+  appearedQuestion.add(question.question);
+  return question;
 };
 
 export const AdminPanel = () => {
@@ -107,13 +124,11 @@ export const AdminPanel = () => {
           disabled={!isGameOpened || isGameStarted}
           onClick={() => {
             setIsGameStarted(true);
-            // do fetch question
-            // do shuffle question
-            setQuestion(item);
+            setQuestion(SAMPLE_QUESTION);
             broadcastChannelRef.current?.postMessage?.({
               type: FFPayloadType.START_GAME,
               payload: {
-                question: item,
+                question: SAMPLE_QUESTION,
               },
             } as FFPayloadStartGame);
           }}
@@ -126,13 +141,14 @@ export const AdminPanel = () => {
               color="secondary"
               className="mt-2 disabled:opacity-60 hover:disabled:opacity-60"
               onClick={() => {
+                const nextQuestion = shuffleQuestion();
                 broadcastChannelRef.current?.postMessage?.({
                   type: FFPayloadType.NEXT_QUESTION,
                   payload: {
-                    question: item,
+                    question: nextQuestion,
                   },
                 } as FFPayloadNextQuestion);
-                setQuestion(item);
+                setQuestion(nextQuestion);
               }}
             >
               Next Question
