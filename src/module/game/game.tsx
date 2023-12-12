@@ -2,11 +2,13 @@ import { GameBox } from '@/components/game/box';
 import { Cards } from '@/components/game/cards';
 import { Counter } from '@/components/game/counter';
 import { useEffect, useRef, useState } from 'react';
-import FamilyFeudLogo from '@/assets/images/family-feud.png';
 import { FFPayloadType, type FFPayload, type FFQuestions } from '@/types';
 import { RedHeart } from '@/components/game/icons/red-heart';
 import { BlackHeart } from '@/components/game/icons/black-heart';
 import { twMerge } from 'tailwind-merge';
+import { motion, animate } from 'framer-motion';
+import FamilyFeudLogo from '@/assets/images/family-feud.png';
+import IncorrectLogo from '@/assets/images/x.png';
 
 const gameKey = 'family-feud';
 const audioThemeSong = new Audio('./sfx/ff-theme-song.mp3');
@@ -24,9 +26,34 @@ export const Game = () => {
   const [teamBScore, setTeamBScore] = useState(0);
   const [playingTeam, setPlayingTeam] = useState<'A' | 'B' | null>(null);
   const [life, setLife] = useState(5);
+  const [incorrectLogo, setIncorrectLogo] = useState(1);
 
   useEffect(() => {
     broadcastChannelRef.current = new BroadcastChannel(gameKey);
+
+    const showIncorrectLogo = (all?: boolean) => {
+      if (all) {
+        setIncorrectLogo(5);
+      }
+      setTimeout(() => {
+        animate(document.querySelectorAll('.incorrect-logo')!, {
+          opacity: 1,
+          scale: 1,
+        }).then(() => {
+          setTimeout(() => {
+            animate(document.querySelectorAll('.incorrect-logo')!, {
+              opacity: 0,
+              scale: 0,
+            });
+          }, 1500);
+          setTimeout(() => {
+            if (!all) {
+              setIncorrectLogo(prev => prev + 1);
+            }
+          }, 2000);
+        });
+      }, 200);
+    };
 
     const callback = (event: MessageEvent<FFPayload>) => {
       if (event.data.type === FFPayloadType.START_GAME) {
@@ -38,6 +65,7 @@ export const Game = () => {
         setItem(event.data.payload.question);
         setGameScore(0);
         setLife(5);
+        setIncorrectLogo(1);
         window.dispatchEvent(new Event('FF_CLOSE_ANSWER_RESET_ROUND'));
       }
 
@@ -47,6 +75,7 @@ export const Game = () => {
         setTeamAScore(0);
         setTeamBScore(0);
         setLife(5);
+        setIncorrectLogo(1);
         window.dispatchEvent(new Event('FF_CLOSE_ANSWER_RESET_ROUND'));
       }
 
@@ -65,12 +94,14 @@ export const Game = () => {
         setLife(prevLife => prevLife - 1);
         audioIncorrect.volume = 0.3;
         audioIncorrect.play();
+        showIncorrectLogo();
       }
 
       if (event.data.type === FFPayloadType.SOUND_INCORRECT_ALL) {
         setLife(0);
         audioIncorrectAll.volume = 0.3;
         audioIncorrectAll.play();
+        showIncorrectLogo(true);
       }
 
       if (event.data.type === FFPayloadType.BEGIN_CLOCK) {
@@ -83,9 +114,11 @@ export const Game = () => {
             if (nextLife >= 1) {
               audioIncorrect.volume = 0.3;
               audioIncorrect.play();
+              showIncorrectLogo();
             } else {
               audioIncorrectAll.volume = 0.3;
               audioIncorrectAll.play();
+              showIncorrectLogo(true);
             }
 
             return nextLife;
@@ -108,11 +141,13 @@ export const Game = () => {
 
       if (event.data.type === FFPayloadType.TEAM_A_PLAY) {
         setLife(5);
+        setIncorrectLogo(1);
         setPlayingTeam('A');
       }
 
       if (event.data.type === FFPayloadType.TEAM_B_PLAY) {
         setLife(5);
+        setIncorrectLogo(1);
         setPlayingTeam('B');
       }
     };
@@ -132,6 +167,19 @@ export const Game = () => {
         alt="Family Feud Logo"
         className="max-w-[160px] w-full absolute top-5 left-5"
       />
+      <div className="absolute inset-0">
+        <div className="flex items-center justify-center h-full">
+          {Array.from({ length: incorrectLogo }).map((_, index) => (
+            <motion.img
+              key={`incorrect-logo-${index}`}
+              src={IncorrectLogo}
+              alt="Incorrect Logo"
+              className="flex items-center justify-center z-10 mb-10 incorrect-logo"
+              initial={{ opacity: 0, scale: 0, width: '200px' }}
+            />
+          ))}
+        </div>
+      </div>
       <div className="absolute top-5 right-5 text-right">
         <p className="font-bold text-[#003C7B]">Playing Team : </p>
         <p className="text-[#003C7B]">
