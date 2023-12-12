@@ -24,6 +24,7 @@ export const Cards = memo(({ answer, value, order, setScore }: CardsProps) => {
   const onClick = useCallback(
     (forceValue?: boolean, cancelScore?: true) => {
       if (answer === '') return;
+      if (isFlipped === forceValue) return;
       let next: boolean;
       setIsFlipped(prev => {
         if (forceValue !== undefined) {
@@ -50,7 +51,7 @@ export const Cards = memo(({ answer, value, order, setScore }: CardsProps) => {
         }, 100);
       }
     },
-    [answer, order, setScore, value],
+    [answer, isFlipped, order, setScore, value],
   );
 
   useEffect(() => {
