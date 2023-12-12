@@ -72,6 +72,7 @@ export const AdminPanel = () => {
 
   useEffect(() => {
     broadcastChannelRef.current = new BroadcastChannel(gameKey);
+    document.title = 'Family Feud - Admin Panel';
 
     return () => {
       broadcastChannelRef.current?.close();
@@ -198,37 +199,10 @@ export const AdminPanel = () => {
             )}
           </Table>
           <div className="flex flex-col gap-y-2">
-            <h1 className="text-2xl font-bold">Playing Team</h1>
-            <div className="flex gap-x-2">
-              <Button
-                color="primary"
-                className="mt-2 disabled:opacity-60 hover:disabled:opacity-60"
-                onClick={() => {
-                  broadcastChannelRef.current?.postMessage?.({
-                    type: FFPayloadType.TEAM_A_PLAY,
-                  } as FFPayloadTeamAPlay);
-                }}
-              >
-                Team A
-              </Button>
-              <Button
-                color="primary"
-                className="mt-2 disabled:opacity-60 hover:disabled:opacity-60"
-                onClick={() => {
-                  broadcastChannelRef.current?.postMessage?.({
-                    type: FFPayloadType.TEAM_B_PLAY,
-                  } as FFPayloadTeamBPlay);
-                }}
-              >
-                Team B
-              </Button>
-            </div>
-          </div>
-          <div className="flex flex-col gap-y-2">
             <h1 className="text-2xl font-bold">Sound Control</h1>
             <div className="flex gap-x-2">
               <Button
-                color="default"
+                color="secondary"
                 className="mt-2 disabled:opacity-60 hover:disabled:opacity-60"
                 onClick={() => {
                   broadcastChannelRef.current?.postMessage?.({
@@ -239,7 +213,7 @@ export const AdminPanel = () => {
                 Play Clock
               </Button>
               <Button
-                color="default"
+                color="secondary"
                 className="mt-2 disabled:opacity-60 hover:disabled:opacity-60"
                 onClick={() => {
                   broadcastChannelRef.current?.postMessage?.({
@@ -294,6 +268,33 @@ export const AdminPanel = () => {
                 }}
               >
                 Play Winner
+              </Button>
+            </div>
+          </div>
+          <div className="flex flex-col gap-y-2">
+            <h1 className="text-2xl font-bold">Playing Team</h1>
+            <div className="flex gap-x-2">
+              <Button
+                color="primary"
+                className="mt-2 disabled:opacity-60 hover:disabled:opacity-60"
+                onClick={() => {
+                  broadcastChannelRef.current?.postMessage?.({
+                    type: FFPayloadType.TEAM_A_PLAY,
+                  } as FFPayloadTeamAPlay);
+                }}
+              >
+                Team A
+              </Button>
+              <Button
+                color="primary"
+                className="mt-2 disabled:opacity-60 hover:disabled:opacity-60"
+                onClick={() => {
+                  broadcastChannelRef.current?.postMessage?.({
+                    type: FFPayloadType.TEAM_B_PLAY,
+                  } as FFPayloadTeamBPlay);
+                }}
+              >
+                Team B
               </Button>
             </div>
           </div>

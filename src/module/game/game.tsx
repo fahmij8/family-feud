@@ -13,6 +13,7 @@ const audioWinRound = new Audio('./sfx/ff-win-round.mp3');
 const audioApplause = new Audio('./sfx/ff-applause.mp3');
 const audioIncorrect = new Audio('./sfx/ff-incorrect.wav');
 const audioIncorrectAll = new Audio('./sfx/ff-incorrect-all.mp3');
+const audioClock = new Audio('./sfx/ff-clock-10s.mp3');
 
 export const Game = () => {
   const broadcastChannelRef = useRef<BroadcastChannel | null>(null);
@@ -72,11 +73,31 @@ export const Game = () => {
       }
 
       if (event.data.type === FFPayloadType.BEGIN_CLOCK) {
-        // todo: begin clock
+        audioClock.volume = 0.3;
+        audioClock.play();
+        audioClock.onended = () => {
+          setLife(prevLife => {
+            const nextLife = prevLife - 1;
+
+            if (nextLife >= 1) {
+              audioIncorrect.volume = 0.3;
+              audioIncorrect.play();
+            } else {
+              audioIncorrectAll.volume = 0.3;
+              audioIncorrectAll.play();
+            }
+
+            return nextLife;
+          });
+        };
       }
 
       if (event.data.type === FFPayloadType.STOP_CLOCK) {
         // todo: stop clock
+        if (audioClock.paused === false) {
+          audioClock.pause();
+          audioClock.currentTime = 0;
+        }
       }
 
       if (event.data.type === FFPayloadType.WINNER) {
@@ -115,7 +136,6 @@ export const Game = () => {
         <p className="text-[#003C7B]">
           {playingTeam ? `Team ${playingTeam}` : '-'}
         </p>
-        {/* map the life */}
         <p className="font-bold text-[#003C7B]">Life : </p>
         {playingTeam ? (
           <div className="flex items-center justify-end gap-x-1">
@@ -131,7 +151,7 @@ export const Game = () => {
         )}
       </div>
       <div
-        className="[text-shadow:1px_1px_3px_rgba(0,0,0,1)] border-[5px] border-[#003c7b] py-[120px] px-[140px] rounded-[50%] text-center max-w-[1300px] max-h-[800px] min-w-[305px] m-auto text-white bg-[url(./assets/gameboard-bg.svg)] bg-[#0C4779] relative bg-repeat bg-center [box-shadow:0_1px_24px_1px_rgba(0,0,0,0.48)]"
+        className="[text-shadow:1px_1px_3px_rgba(0,0,0,1)] border-[5px] border-[#003c7b] py-[120px] px-[140px] rounded-[50%] text-center max-w-[1300px] max-h-[800px] min-w-[305px] m-auto text-white bg-[url(assets/gameboard-bg.svg)] bg-[#0C4779] relative bg-repeat bg-center [box-shadow:0_1px_24px_1px_rgba(0,0,0,0.48)]"
         id="gameboard"
       >
         <GameBox
@@ -273,7 +293,6 @@ export const Game = () => {
             Award Team B
           </button>
         </div>
-        d
       </div>
     </div>
   );
